@@ -68,8 +68,8 @@ export class CampaignService extends Controller implements CampaignServiceInterf
         for (let offset = 0; offset < totalUsers; offset += batchSize) {
             const userBatch = await this.userRepo.getUsers({ isSubscribed: true }, batchSize, offset);
 
-            if (userBatch.length === 0) {
-                break;
+            if (!userBatch.length) {
+                return;
             }
 
             totalProcessedUsers += userBatch.length;
@@ -81,17 +81,14 @@ export class CampaignService extends Controller implements CampaignServiceInterf
                 name: user.name,
             }));
 
+            // Prepare same email payloads for all users in the batch
             const emailPayloads = {
                 subject: campaign.subject,
                 body: campaign.body,
                 users,
             }
 
-            // Publish the current batch of email data to Kafka
             await this.kafkaMQ.sendToTopic("email-topic", JSON.stringify(emailPayloads));
-
-            // Optionally, you can introduce a delay to avoid overwhelming the system
-            // await delay(500);  // Add a pause between batches (in ms)
         }
 
         return { data: null, message: "Campaign emails have been queued for processing" };
