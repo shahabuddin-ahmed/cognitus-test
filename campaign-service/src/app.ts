@@ -4,9 +4,11 @@ import morgan from "morgan";
 import config from "./config/config";
 import { newV1Router } from "./web/router/v1/index";
 import { newCampaignRepo } from "./repo/campaign";
+import { newUserRepo } from "./repo/user";
 import { newCampaignService } from "./service/campaign";
 import { newCampaignV1Controller } from "./web/controller/v1/campaign";
 import { initializeDBConnection } from "./infra/mongo";
+import { initializeKafkaMQ } from "./infra/kafka";
 
 const app = express();
 
@@ -20,11 +22,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
         config.MONGO.MONGO_DB
     );
 
+    // Initialize Kafka
+    const kafkaMQ = await initializeKafkaMQ(config.KAFKA.KAFKA_HOST);
+
     // Initialize Repo
     const campaignRepo = await newCampaignRepo(db, "campaign");
+    const userRepo = await newUserRepo(db, "user");
 
     // Initialize Service
-    const campaignService = await newCampaignService(campaignRepo);
+    const campaignService = await newCampaignService(campaignRepo, userRepo, kafkaMQ);
 
     // Initialize Controller
     const campaignV1Controller = await newCampaignV1Controller(campaignService);

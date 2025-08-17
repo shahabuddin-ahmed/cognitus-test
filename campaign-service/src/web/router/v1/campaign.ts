@@ -11,6 +11,7 @@ export const newCampaignRouter = async (
     router.get('/list', asyncHandler(campaignController.getAll));
     router.get('/campaign/:campaignID', asyncHandler(campaignController.getById));
     router.patch('/campaign/:campaignID/status', asyncHandler(campaignController.updateStatus));
+    router.post('/campaign/:campaignID/publish', asyncHandler(campaignController.publishCampaign));
 
     return router;
 };

@@ -9,6 +9,7 @@ export interface CampaignControllerInterface {
     updateStatus(req: Request, res: Response): any;
     getAll(req: Request, res: Response): any;
     getById(req: Request, res: Response): any;
+    publishCampaign(req: Request, res: Response): any;
 }
 
 export class CampaignController extends Controller implements CampaignControllerInterface {
@@ -40,15 +41,15 @@ export class CampaignController extends Controller implements CampaignController
     }
 
     async updateStatus(req: Request, res: Response): Promise<any> {
-        const { campaignID } = req.params;
 
         const schema = Joi.object({
+            campaignID: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
             status: Joi.string().valid(...Object.values(CAMPAIGN_STATUS)).required()
         });
 
-        const { value } = await this.validateRequest(schema, req.body);
+        const { value } = await this.validateRequest(schema, { ...req.params, ...req.body });
 
-        const updatedCampaign = await this.campaignService.updateStatus(campaignID, value.status);
+        const updatedCampaign = await this.campaignService.updateStatus(value.campaignID, value.status);
         return this.sendResponse({ response: updatedCampaign }, 200, res);
     }
 
@@ -68,6 +69,17 @@ export class CampaignController extends Controller implements CampaignController
 
         const campaign = await this.campaignService.getById(value.campaignID);
         return this.sendResponse({ response: campaign }, 200, res);
+    }
+
+    public async publishCampaign(req: Request, res: Response): Promise<any> {
+        const schema = Joi.object({
+            campaignID: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
+        });
+
+        const { value } = await this.validateRequest(schema, req.params);
+        const response = await this.campaignService.publishCampaign(value.campaignID);
+
+        return this.sendResponse({ response }, 200, res);
     }
 }
 
