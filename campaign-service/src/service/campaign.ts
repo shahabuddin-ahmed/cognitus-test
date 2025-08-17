@@ -1,6 +1,6 @@
-import { UserInterface } from './../model/user';
-import { UserRepoInterface } from './../repo/user';
-import { KafkaMQ } from './../infra/kafka';
+import { CAMPAIGN_STATUS } from "../constant/common";
+import { UserRepoInterface } from "./../repo/user";
+import { KafkaMQ } from "./../infra/kafka";
 import { ERROR_CODES } from "./../constant/error";
 import { CampaignRepoInterface } from "../repo/campaign";
 import { Controller } from "../web/controller/controller";
@@ -64,6 +64,7 @@ export class CampaignService extends Controller implements CampaignServiceInterf
         }
 
         const totalUsers = await this.userRepo.countUsers({ isSubscribed: true });
+        await this.campaignRepo.updateStatus(campaignID, CAMPAIGN_STATUS.SENDING);
 
         for (let offset = 0; offset < totalUsers; offset += batchSize) {
             const userBatch = await this.userRepo.getUsers({ isSubscribed: true }, batchSize, offset);
@@ -91,6 +92,7 @@ export class CampaignService extends Controller implements CampaignServiceInterf
             await this.kafkaMQ.sendToTopic("email-topic", JSON.stringify(emailPayloads));
         }
 
+        await this.campaignRepo.updateStatus(campaignID, CAMPAIGN_STATUS.SENT);
         return { data: null, message: "Campaign emails have been queued for processing" };
     }
 }

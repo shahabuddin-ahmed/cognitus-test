@@ -1,4 +1,4 @@
-import { CAMPAIGN_STATUS } from './../../../constant/common';
+import { CAMPAIGN_STATUS } from "./../../../constant/common";
 import { Request, Response } from "express";
 import { CampaignServiceInterface } from "../../../service/campaign";
 import { Controller } from "../controller";
@@ -31,7 +31,7 @@ export class CampaignController extends Controller implements CampaignController
             body: Joi.string().required(),
             recipients: Joi.array().items(Joi.string().email()).required(),
             scheduledTime: Joi.date().iso().required(),
-            status: Joi.string().valid(...Object.values(CAMPAIGN_STATUS)).default('scheduled'),
+            status: Joi.string().valid(...Object.values(CAMPAIGN_STATUS)).default(CAMPAIGN_STATUS.SCHEDULED),
         });
 
         const { value } = await this.validateRequest(schema, req.body);
