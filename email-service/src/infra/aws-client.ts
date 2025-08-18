@@ -24,7 +24,7 @@ export class AWSClient {
 
     public async getTemplateByName(name: string): Promise<GetObjectOutput> {
 		return new Promise((resolve, reject) => {
-			newAWSClient().send(new GetObjectCommand({
+			AWSClient.getInstance().send(new GetObjectCommand({
 				Bucket: process.env.AWS_S3_BUCKET,
 				Key: name
 			})).then(resolve).catch(reject);
@@ -32,8 +32,8 @@ export class AWSClient {
 	}
 }
 
-const newAWSClient = (): S3Client => {
-    return AWSClient.getInstance();
+const newAWSClient = () => {
+    return new AWSClient();
 };
 
 export default newAWSClient;

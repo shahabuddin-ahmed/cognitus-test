@@ -10,10 +10,11 @@ import Mail from "nodemailer/lib/mailer";
 import { ERROR_CODES } from "../constant/error";
 import config from "../config/config";
 import { EMAIL_QUEUE_STATUS } from "../constant/common";
+import newAWSClient from "../infra/aws-client";
+import { EmailQueueInterface } from "../model/email-queue";
 
 export interface EmailSenderServiceInterface {
     consumeEmailBatch(): Promise<void>;
-    sendEmails(users: any[], templateName: string): Promise<void>;
 }
 
 export class EmailSenderService implements EmailSenderServiceInterface {
@@ -41,27 +42,45 @@ export class EmailSenderService implements EmailSenderServiceInterface {
         });
     }
 
-    public async sendEmails(users: any[], templateName: string): Promise<void> {
+    private async sendEmails(users: any[], templateName: string): Promise<void> {
         const emailTemplate = await this.emailTemplateRepo.getByName(templateName);
 		if (!emailTemplate) {
 			throw new BadRequestException(ERROR_CODES.EMAIL_TEMPLATE_NOT_FOUND);
 		}
 
         const { templateOnS3 } = await this.getTemplateFromS3(templateName);
-        const renderedHtml = await this.renderHtml(templateOnS3.toString(), {});
+        const renderedHtml = await this.renderHtml(templateOnS3.toString(), { users });
 
-        for (const user of users) {
+        const responses = await Promise.allSettled(
+            users.map(user => this.sendEmail(user.to, emailTemplate, renderedHtml))
+        );
 
-            try {
-
-                await this.sendEmail(user.to, emailTemplate, renderedHtml);
-            } catch (error) {
-                console.error(`Failed to send email to ${user.to}:`, error);
+        responses.forEach(async (response, index) => {
+            const user = users[index];
+            
+           const data: EmailQueueInterface = {
+                from: config.EMAIL.sender.from,
+                to: user.to,
+                replyTo: emailTemplate.replyTo || "",
+                cc: emailTemplate.cc || [],
+                bcc: emailTemplate.bcc || [],
+                subject: emailTemplate.subject,
+                client: emailTemplate.client,
+                service: emailTemplate.service,
+                sender: emailTemplate.sender,
+                message: response.status === "rejected" ? JSON.stringify(response.reason) : "",
+                data: response.status === "rejected" ? JSON.stringify(user) : "",
+                templateName: emailTemplate.templateName,
+                status: EMAIL_QUEUE_STATUS.SENT,
+                createdAt: new Date(),
+                updatedAt: new Date()
             }
-        }
+
+            await this.emailQueueRepo.create(data);
+        });
     }
 
-    public async renderHtml(html: string, context: Record<string, unknown>): Promise<string> {
+    private async renderHtml(html: string, context: Record<string, unknown>): Promise<string> {
 		return render(html, context);
 	}
 
@@ -78,7 +97,7 @@ export class EmailSenderService implements EmailSenderServiceInterface {
 
     public async getTemplateFromS3(templateName: string): Promise<{ templateOnS3: GetObjectOutput }> {
 		try {
-			return { templateOnS3: await this.fileService.getTemplateByName(`${ templateName }.html`) };
+			return { templateOnS3: await newAWSClient().getTemplateByName(`${ templateName }.html`) };
 		} catch (err) {
             throw new BadRequestException(ERROR_CODES.EMAIL_TEMPLATE_NOT_FOUND);
 		}

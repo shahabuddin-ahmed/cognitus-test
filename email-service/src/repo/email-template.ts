@@ -38,3 +38,9 @@ export class EmailTemplateRepo implements EmailTemplateRepoInterface {
         return result.deletedCount > 0;
     }
 }
+
+export const newEmailTemplateRepo = async (db: DBInterface, collection: string): Promise<EmailTemplateRepoInterface> => {
+    return new EmailTemplateRepo(db, collection);
+};
+
+export default EmailTemplateRepo;

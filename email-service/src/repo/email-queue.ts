@@ -33,3 +33,9 @@ export class EmailQueueRepo implements EmailQueueRepoInterface {
         return result.deletedCount > 0;
     }
 }
+
+export const newEmailQueueRepo = async (db: DBInterface, collection: string): Promise<EmailQueueRepoInterface> => {
+    return new EmailQueueRepo(db, collection);
+};
+
+export default EmailQueueRepo;

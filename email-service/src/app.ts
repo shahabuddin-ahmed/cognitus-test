@@ -3,10 +3,9 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import config from "./config/config";
 import { newV1Router } from "./web/router/v1/index";
-import { newCampaignRepo } from "./repo/campaign";
-import { newUserRepo } from "./repo/user";
-import { newCampaignService } from "./service/campaign";
-import { newCampaignV1Controller } from "./web/controller/v1/campaign";
+import { newEmailQueueRepo } from "./repo/email-queue";
+import { newEmailTemplateRepo } from "./repo/email-template";
+import { newEmailSenderService } from "./service/email-sender";
 import { initializeDBConnection } from "./infra/mongo";
 import { initializeKafkaMQ } from "./infra/kafka";
 
@@ -23,22 +22,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
     );
 
     // Initialize Kafka
-    const kafkaMQ = await initializeKafkaMQ(config.KAFKA.KAFKA_HOST);
+    const kafkaMQ = await initializeKafkaMQ(config.KAFKA.KAFKA_HOST, config.KAFKA.KAFKA_TOPIC);
 
     // Initialize Repo
-    const campaignRepo = await newCampaignRepo(db, "campaign");
-    const userRepo = await newUserRepo(db, "user");
+    const emailTemplateRepo = await newEmailTemplateRepo(db, "email-template");
+    const emailQueueRepo = await newEmailQueueRepo(db, "email-queue");
 
     // Initialize Service
-    const campaignService = await newCampaignService(campaignRepo, userRepo, kafkaMQ);
-
-    // Initialize Controller
-    const campaignV1Controller = await newCampaignV1Controller(campaignService);
+    const campaignService = await newEmailSenderService(kafkaMQ, emailQueueRepo, emailTemplateRepo);
 
     // Initialize Router
-    const v1Router = await newV1Router({
-        campaignController: campaignV1Controller,
-    });
+    const v1Router = await newV1Router();
 
     app.use(morgan("short"));
     app.use("/api/v1", v1Router);
