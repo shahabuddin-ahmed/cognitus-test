@@ -7,7 +7,9 @@ export enum ERROR_CODES {
     E_INTERNAL_SERVER_ERROR = "E_INTERNAL_SERVER_ERROR",
     BAD_REQUEST = "BAD_REQUEST",
     CAMPAIGN_ALREADY_EXISTS = "CAMPAIGN_ALREADY_EXISTS",
-    CAMPAIGN_NOT_FOUND = "CAMPAIGN_NOT_FOUND"
+    CAMPAIGN_NOT_FOUND = "CAMPAIGN_NOT_FOUND",
+    USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS",
+    USER_NOT_FOUND = "USER_NOT_FOUND"
 }
 
 export const errorMessages: Record<ERROR_CODES, { message: string }> = {
@@ -37,6 +39,12 @@ export const errorMessages: Record<ERROR_CODES, { message: string }> = {
     },
     CAMPAIGN_NOT_FOUND: {
         message: "Campaign not found"
+    },
+    USER_ALREADY_EXISTS: {
+        message: "User already exists"
+    },
+    USER_NOT_FOUND: {
+        message: "User not found"
     }
 };
 

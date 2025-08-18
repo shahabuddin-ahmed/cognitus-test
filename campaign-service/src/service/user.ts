@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import { BadRequestException } from './../../../email-service/src/web/exception/bad-request-exception';
+import { BadRequestException } from "../web/exception/bad-request-exception";
 import { UserRepoInterface } from "../repo/user";
 import { Controller } from "../web/controller/controller";
 import { UserInterface } from "../model/user";
-import { ERROR_CODES } from '../../../email-service/src/constant/error';
+import { ERROR_CODES } from "../constant/error";
 
 export interface UserServiceInterface {
     create(user: UserInterface): Promise<UserInterface>;
