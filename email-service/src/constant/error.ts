@@ -8,7 +8,8 @@ export enum ERROR_CODES {
     BAD_REQUEST = "BAD_REQUEST",
     CAMPAIGN_ALREADY_EXISTS = "CAMPAIGN_ALREADY_EXISTS",
     CAMPAIGN_NOT_FOUND = "CAMPAIGN_NOT_FOUND",
-    EMAIL_TEMPLATE_NOT_FOUND = "EMAIL_TEMPLATE_NOT_FOUND"
+    EMAIL_TEMPLATE_NOT_FOUND = "EMAIL_TEMPLATE_NOT_FOUND",
+    E_EMAIL_TEMPLATE_ALREADY_EXISTS = "E_EMAIL_TEMPLATE_ALREADY_EXISTS"
 }
 
 export const errorMessages: Record<ERROR_CODES, { message: string }> = {
@@ -41,7 +42,10 @@ export const errorMessages: Record<ERROR_CODES, { message: string }> = {
     },
     EMAIL_TEMPLATE_NOT_FOUND: {
         message: "Email template not found"
-    }
+    },
+    E_EMAIL_TEMPLATE_ALREADY_EXISTS: {
+        message: "Email template with this name already exists"
+    },
 };
 
 export enum ApiResponseMessages {

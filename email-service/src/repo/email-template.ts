@@ -22,7 +22,7 @@ export class EmailTemplateRepo implements EmailTemplateRepoInterface {
     }
 
     public async getByName(emailTemplateName: string): Promise<EmailTemplateInterface | null> {
-        return this.db.findOne(this.collection, { name: emailTemplateName });
+        return this.db.findOne(this.collection, { templateName: emailTemplateName });
     }
 
     public async getAll(skip: number, limit: number): Promise<EmailTemplateInterface[]> {

@@ -8,6 +8,9 @@ import { newEmailTemplateRepo } from "./repo/email-template";
 import { newEmailSenderService } from "./service/email-sender";
 import { initializeDBConnection } from "./infra/mongo";
 import { initializeKafkaMQ } from "./infra/kafka";
+import { newEmailTemplateService } from "./service/email-template";
+import { newEmailTemplateController } from "./web/controller/v1/email-template";
+import { globalErrorHandler } from "./web/middleware/global-error-handler";
 
 const app = express();
 
@@ -30,13 +33,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
     // Initialize Service
     const emailSenderService = await newEmailSenderService(kafkaMQ, emailQueueRepo, emailTemplateRepo);
+    const emailTemplateService = await newEmailTemplateService(emailTemplateRepo);
     await emailSenderService.consumeEmailBatch();
 
+    // Initialize Controller
+    const emailTemplateController = newEmailTemplateController(emailTemplateService);
+
     // Initialize Router
-    const v1Router = await newV1Router();
+    const v1Router = await newV1Router(emailTemplateController);
 
     app.use(morgan("short"));
     app.use("/api/v1", v1Router);
+    app.use(globalErrorHandler);
 })();
 
 export default app;
