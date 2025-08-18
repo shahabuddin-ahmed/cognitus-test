@@ -1,4 +1,5 @@
-import { KafkaClient, Producer, Consumer, Message } from "kafka-node";
+import { Kafka, Producer, ProducerRecord, logLevel } from 'kafkajs';
+import config from "../config/config";
 
 export interface PublishOption {
     key?: string;
@@ -20,36 +21,54 @@ export class KafkaMQ implements MQInterface {
     }
 
     public async sendToTopic(topic: string, message: string, option?: PublishOption): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            const payloads = [{
-                topic: topic,
-                messages: message,
+        const payload: ProducerRecord = {
+            topic: topic,
+            messages: [{
+                value: message,
                 key: option?.key,
-                partition: option?.partition,
-                timestamp: option?.timestamp,
                 headers: option?.headers,
-            }];
+                timestamp: option?.timestamp ? new Date(option.timestamp).toISOString() : undefined
+            }]
+        };
 
-            this.kafkaProducer.send(payloads, (err, data) => {
-                if (err) {
-                    console.error("Error sending message to Kafka", err);
-                    reject(false);
-                }
-                console.log("Message sent to Kafka", data);
-                resolve(true);
-            });
-        });
+        try {
+            await this.kafkaProducer.send(payload);
+            console.log("Message sent to Kafka");
+            return true;
+        } catch (err) {
+            console.error("Error sending message to Kafka", err);
+            return false;
+        }
     }
 }
 
 export const initializeKafkaMQ = async (kafkaHost: string): Promise<KafkaMQ> => {
-    const client = new KafkaClient({ kafkaHost: kafkaHost });
-
-    const producer = new Producer(client);
-
-    producer.on("ready", () => {
-        console.log("Kafka producer is ready");
+    const kafka = new Kafka({
+        clientId: 'Campaign',
+        brokers: [kafkaHost],
+        logLevel: logLevel.INFO
     });
+
+    const producer = kafka.producer();
+
+    await producer.connect();
+    console.log("Kafka producer is ready");
+    const admin = kafka.admin();
+    await admin.connect();
+
+    try {
+        const topics = await admin.listTopics();
+        if (!topics.includes(config.KAFKA.KAFKA_TOPIC)) {
+            await admin.createTopics({
+                topics: [{ topic: config.KAFKA.KAFKA_TOPIC }]
+            });
+            console.log(`Topic ${config.KAFKA.KAFKA_TOPIC} created`);
+        }
+    } catch (error) {
+        console.error("Error creating Kafka topics:", error);
+    }
+
+    await admin.disconnect();
 
     return new KafkaMQ(producer);
 };

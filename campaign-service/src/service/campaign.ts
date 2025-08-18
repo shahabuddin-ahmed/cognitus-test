@@ -6,6 +6,7 @@ import { CampaignRepoInterface } from "../repo/campaign";
 import { Controller } from "../web/controller/controller";
 import { CampaignInterface } from "../model/campaign";
 import { BadRequestException } from "../web/exception/bad-request-exception";
+import config from "../config/config";
 
 export interface CampaignServiceInterface {
     create(campaign: CampaignInterface): Promise<CampaignInterface>;
@@ -63,11 +64,12 @@ export class CampaignService extends Controller implements CampaignServiceInterf
             throw new BadRequestException(ERROR_CODES.CAMPAIGN_NOT_FOUND);
         }
 
-        const totalUsers = await this.userRepo.countUsers({ isSubscribed: true });
+        const totalUsers = await this.userRepo.countUsers({ isSubscribed: 'true' });
+        console.log(`Total users to process: ${totalUsers}`);
         await this.campaignRepo.updateStatus(campaignID, CAMPAIGN_STATUS.SENDING);
 
         for (let offset = 0; offset < totalUsers; offset += batchSize) {
-            const userBatch = await this.userRepo.getUsers({ isSubscribed: true }, batchSize, offset);
+            const userBatch = await this.userRepo.getUsers({ isSubscribed: 'true' }, batchSize, offset);
 
             if (!userBatch.length) {
                 return;
@@ -90,7 +92,13 @@ export class CampaignService extends Controller implements CampaignServiceInterf
                 users,
             }
 
-            await this.kafkaMQ.sendToTopic("email-topic", JSON.stringify(emailPayloads));
+            console.log(emailPayloads);
+
+            try {
+                await this.kafkaMQ.sendToTopic(config.KAFKA.KAFKA_TOPIC, JSON.stringify(emailPayloads));
+            } catch (error) {
+                console.error("Error sending email payloads to Kafka:", error);
+            }
         }
 
         await this.campaignRepo.updateStatus(campaignID, CAMPAIGN_STATUS.SENT);

@@ -9,6 +9,7 @@ import { newCampaignService } from "./service/campaign";
 import { newCampaignV1Controller } from "./web/controller/v1/campaign";
 import { initializeDBConnection } from "./infra/mongo";
 import { initializeKafkaMQ } from "./infra/kafka";
+import { globalErrorHandler } from "./web/middleware/global-error-handler";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(morgan("short"));
     app.use("/api/v1", v1Router);
+    app.use(globalErrorHandler);
 })();
 
 export default app;

@@ -1,6 +1,4 @@
 import { Router } from "express";
-import { CampaignControllerInterface } from "../../controller/v1/campaign";
-import { newCampaignRouter } from "./campaign";
 import { NotFoundException } from "../../exception/not-found-exception";
 import { ERROR_CODES } from "../../../constant/error";
 import { newHealthRouter } from "./health";

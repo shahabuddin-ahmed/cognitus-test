@@ -2,6 +2,7 @@ import { UserInterface } from "../model/user";
 import { DBInterface } from "../infra/db";
 
 export interface UserRepoInterface {
+    create(user: UserInterface): Promise<UserInterface>;
     getById(userId: string): Promise<UserInterface | null>;
     getUsers(predicate: Record<string, any>, limit: number, offset: number): Promise<UserInterface[]>;
     countUsers(predicate: Record<string, any>): Promise<number>;
@@ -11,6 +12,10 @@ export class UserRepo implements UserRepoInterface {
     constructor(private db: DBInterface, private collection: string) {
         this.db = db;
         this.collection = collection;
+    }
+
+    public async create(user: UserInterface): Promise<UserInterface> {
+        return this.db.create(this.collection, user);
     }
 
     public async getById(userId: string): Promise<UserInterface | null> {

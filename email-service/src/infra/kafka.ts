@@ -1,35 +1,68 @@
-import { KafkaClient, Producer, Consumer, Message } from "kafka-node";
+import { Kafka, Consumer, EachMessagePayload } from "kafkajs";
 
 export interface KafkaMQInterface {
-    consumeFromTopic(topic: string, callback: (message: Message) => void): void;
+    consumeFromTopic(topic: string, workerFn: (message: EachMessagePayload) => any, option?: { autoCommit: boolean }): void;
 }
 
 export class KafkaMQ implements KafkaMQInterface {
-    private kafkaConsumer: Consumer;
 
-    constructor(private kafkaClient: KafkaClient, private topic: string) {
-        this.kafkaConsumer = new Consumer(kafkaClient, [{ topic: topic, partition: 0 }], { autoCommit: true }); // Initialize consumer
+    constructor(private consumer: Consumer) {
+        this.consumer = consumer;
     }
 
-    public consumeFromTopic(topic: string, callback: (message: Message) => void): void {
-        this.kafkaConsumer.on("message", (message: Message) => {
-            if (message.topic === topic) {
-                callback(message);
-            }
-        });
+    public async consumeFromTopic(topic: string, workerFn: (message: EachMessagePayload) => any, option?: { autoCommit: boolean }): Promise<void> {
+        try {
+            await this.consumer.run({
+                eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
+                    try {
+                        await workerFn({
+                            topic, partition, message,
+                            heartbeat: function (): Promise<void> {
+                                throw new Error("Function not implemented.");
+                            },
+                            pause: function (): () => void {
+                                throw new Error("Function not implemented.");
+                            }
+                        });
 
-        this.kafkaConsumer.on("error", (err) => {
-            console.error("Error in Kafka Consumer:", err);
-        });
+                        console.log(`Processed message: ${message.value?.toString()} from topic: ${topic}, partition: ${partition}`);
+                        if (option?.autoCommit) {
+                            await this.consumer.commitOffsets([
+                                {
+                                    topic,
+                                    partition,
+                                    offset: (parseInt(message.offset, 10) + 1).toString(),
+                                },
+                            ]);
+                            console.log(`Committed offset ${message.offset} for partition ${partition}`);
+                        }
+                    } catch (err) {
+                        console.error("Error processing message:", err);
+                    }
+                },
+            });
+        } catch (err) {
+            console.error("Error consuming from Kafka topic:", err);
+        }
     }
 }
 
-export const initializeKafkaMQ = async (kafkaHost: string, topic: string): Promise<KafkaMQ> => {
+export const initializeKafkaMQ = async (kafkaHost: string, groupId: string, topic: string): Promise<KafkaMQ> => {
     try {
-        const client = new KafkaClient({ kafkaHost: kafkaHost });
+        const kafka = new Kafka({
+            clientId: "Campaign",
+            brokers: [kafkaHost],
+        });
         console.log("Connected to Kafka server");
 
-        return new KafkaMQ(client, topic);
+        const kafkaConsumer = kafka.consumer({ groupId: "email-consumer-group" });
+        await kafkaConsumer.connect();
+        console.log("Kafka consumer connected");
+
+         await kafkaConsumer.subscribe({ topic, fromBeginning: true });
+        console.log(`Connected to Kafka and consuming messages from topic: ${topic}`);
+
+        return new KafkaMQ(kafkaConsumer);
     } catch (err) {
         console.error("Failed to connect to Kafka", err);
         process.exit(1);

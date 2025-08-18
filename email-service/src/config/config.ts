@@ -6,6 +6,7 @@ interface MongConfig {
 interface KafkaConfig {
     KAFKA_HOST: string;
     KAFKA_TOPIC: string;
+    KAFKA_GROUP_ID: string;
 }
 
 interface EmailConfig {
@@ -44,7 +45,8 @@ const config: Config = {
     },
     KAFKA: {
         KAFKA_HOST: process.env.KAFKA_HOST || "localhost:29092",
-        KAFKA_TOPIC: process.env.KAFKA_TOPIC || "test"
+        KAFKA_TOPIC: process.env.KAFKA_TOPIC || "email-topic",
+        KAFKA_GROUP_ID: process.env.KAFKA_GROUP_ID || "email-consumer-group"
     },
     EMAIL: {
         name: process.env.SENDER_NAME || "default-sender",
@@ -64,7 +66,7 @@ const config: Config = {
         SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "your-secret-access-key",
         REGION: process.env.AWS_REGION || "us-east-1"
     },
-    APPLICATION_SERVER_PORT: Number(process.env.APPLICATION_SERVER_PORT) || 3000,
+    APPLICATION_SERVER_PORT: Number(process.env.APPLICATION_SERVER_PORT) || 3001,
     APP_FORCE_SHUTDOWN_SECOND: Number(process.env.APP_FORCE_SHUTDOWN_SECOND) || 30
 };
 

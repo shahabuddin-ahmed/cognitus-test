@@ -2615,7 +2615,7 @@ json5@^2.2.2:
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
-kafka-node@*, kafka-node@^5.0.0:
+kafka-node@*:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/kafka-node/-/kafka-node-5.0.0.tgz#4b6f65cc1d77ebe565859dfb8f9575ed15d543c0"
   integrity sha512-dD2ga5gLcQhsq1yNoQdy1MU4x4z7YnXM5bcG9SdQuiNr5KKuAmXixH1Mggwdah5o7EfholFbcNDPSVA6BIfaug==
@@ -2635,6 +2635,11 @@ kafka-node@*, kafka-node@^5.0.0:
     uuid "^3.0.0"
   optionalDependencies:
     snappy "^6.0.1"
+
+kafkajs@^2.2.4:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/kafkajs/-/kafkajs-2.2.4.tgz#59e6e16459d87fdf8b64be73970ed5aa42370a5b"
+  integrity sha512-j/YeapB1vfPT2iOIUn/vxdyKEuhuY2PxMBvf5JWux6iSaukAccrMtXEY/Lb7OvavDhOWME589bpLrEdnVHjfjA==
 
 keyv@^4.5.4:
   version "4.5.4"

@@ -22,7 +22,7 @@ const config: Config = {
     },
     KAFKA: {
         KAFKA_HOST: process.env.KAFKA_HOST || "localhost:29092",
-        KAFKA_TOPIC: process.env.KAFKA_TOPIC || "test"
+        KAFKA_TOPIC: process.env.KAFKA_TOPIC || "email-topic"
     },
     APPLICATION_SERVER_PORT: Number(process.env.APPLICATION_SERVER_PORT) || 3000,
     APP_FORCE_SHUTDOWN_SECOND: Number(process.env.APP_FORCE_SHUTDOWN_SECOND) || 30

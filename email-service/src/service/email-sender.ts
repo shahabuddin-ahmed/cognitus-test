@@ -32,9 +32,11 @@ export class EmailSenderService implements EmailSenderServiceInterface {
 
     public async consumeEmailBatch(): Promise<void> {
 
-        this.kafkaMQ.consumeFromTopic("email-topic", async (message) => {
+        this.kafkaMQ.consumeFromTopic(config.KAFKA.KAFKA_TOPIC, async (message) => {
             try {
-                const { users, emailTemplate } = JSON.parse(message.value as string);
+                console.log(`Received message from topic: ${message.topic}, partition: ${message.partition}`);
+                
+                const { users, emailTemplate } = JSON.parse(message.message.value?.toString() || "");
                 await this.sendEmails(users, emailTemplate);
             } catch (error) {
                 console.error("Error processing email batch:", error);

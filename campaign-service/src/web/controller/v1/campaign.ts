@@ -22,6 +22,7 @@ export class CampaignController extends Controller implements CampaignController
         this.updateStatus = this.updateStatus.bind(this);
         this.getAll = this.getAll.bind(this);
         this.getById = this.getById.bind(this);
+        this.publishCampaign = this.publishCampaign.bind(this);
     }
 
     async create(req: Request, res: Response): Promise<any> {
@@ -29,7 +30,6 @@ export class CampaignController extends Controller implements CampaignController
             name: Joi.string().required(),
             subject: Joi.string().required(),
             body: Joi.string().required(),
-            recipients: Joi.array().items(Joi.string().email()).required(),
             scheduledTime: Joi.date().iso().required(),
             status: Joi.string().valid(...Object.values(CAMPAIGN_STATUS)).default(CAMPAIGN_STATUS.SCHEDULED),
         });
@@ -72,6 +72,7 @@ export class CampaignController extends Controller implements CampaignController
     }
 
     public async publishCampaign(req: Request, res: Response): Promise<any> {
+
         const schema = Joi.object({
             campaignID: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
         });

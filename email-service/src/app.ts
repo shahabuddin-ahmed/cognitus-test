@@ -22,14 +22,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
     );
 
     // Initialize Kafka
-    const kafkaMQ = await initializeKafkaMQ(config.KAFKA.KAFKA_HOST, config.KAFKA.KAFKA_TOPIC);
+    const kafkaMQ = await initializeKafkaMQ(config.KAFKA.KAFKA_HOST,  config.KAFKA.KAFKA_GROUP_ID, config.KAFKA.KAFKA_TOPIC);
 
     // Initialize Repo
     const emailTemplateRepo = await newEmailTemplateRepo(db, "email-template");
     const emailQueueRepo = await newEmailQueueRepo(db, "email-queue");
 
     // Initialize Service
-    const campaignService = await newEmailSenderService(kafkaMQ, emailQueueRepo, emailTemplateRepo);
+    const emailSenderService = await newEmailSenderService(kafkaMQ, emailQueueRepo, emailTemplateRepo);
+    await emailSenderService.consumeEmailBatch();
 
     // Initialize Router
     const v1Router = await newV1Router();

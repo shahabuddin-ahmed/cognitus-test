@@ -25,5 +25,5 @@ process.on("SIGINT", gracefulShutdown(server, config.APP_FORCE_SHUTDOWN_SECOND))
 
 
 server.listen(config.APPLICATION_SERVER_PORT, () => {
-    logger.log("Campaign Service API IS RUNNING: " + config.APPLICATION_SERVER_PORT);
+    logger.log("Email Service API IS RUNNING: " + config.APPLICATION_SERVER_PORT);
 });
