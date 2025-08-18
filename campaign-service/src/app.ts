@@ -10,6 +10,8 @@ import { newCampaignV1Controller } from "./web/controller/v1/campaign";
 import { initializeDBConnection } from "./infra/mongo";
 import { initializeKafkaMQ } from "./infra/kafka";
 import { globalErrorHandler } from "./web/middleware/global-error-handler";
+import { newUserService } from "./service/user";
+import { newUserV1Controller } from "./web/controller/v1/user";
 
 const app = express();
 
@@ -32,13 +34,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
     // Initialize Service
     const campaignService = await newCampaignService(campaignRepo, userRepo, kafkaMQ);
+    const userService = await newUserService(userRepo);
 
     // Initialize Controller
     const campaignV1Controller = await newCampaignV1Controller(campaignService);
+    const userV1Controller = await newUserV1Controller(userService);
 
     // Initialize Router
     const v1Router = await newV1Router({
         campaignController: campaignV1Controller,
+        userController: userV1Controller
     });
 
     app.use(morgan("short"));

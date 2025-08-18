@@ -13,6 +13,7 @@
     "author": "Shahabuddin Ahmed",
     "license": "MIT",
     "dependencies": {
+        "bcrypt": "^6.0.0",
         "body-parser": "^1.20.3",
         "express": "^4.21.2",
         "joi": "^17.13.3",
@@ -21,6 +22,7 @@
         "morgan": "^1.10.0"
     },
     "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
         "@types/body-parser": "^1.19.5",
         "@types/express": "^4.17.21",
         "@types/morgan": "^1.9.9",

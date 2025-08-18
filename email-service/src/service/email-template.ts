@@ -24,11 +24,19 @@ export class EmailTemplateService implements EmailTemplateServiceInterface {
     }
 
     public async getById(emailTemplateId: string): Promise<EmailTemplateInterface | null> {
-        return this.emailTemplateRepo.getById(emailTemplateId);
+        const emailTemplate = await this.emailTemplateRepo.getById(emailTemplateId);
+        if (!emailTemplate) {
+            throw new BadRequestException(ERROR_CODES.EMAIL_TEMPLATE_NOT_FOUND);
+        }
+        return emailTemplate;
     }
 
     public async getByName(emailTemplateName: string): Promise<EmailTemplateInterface | null> {
-        return this.emailTemplateRepo.getByName(emailTemplateName);
+        const emailTemplate = await this.emailTemplateRepo.getByName(emailTemplateName);
+        if (!emailTemplate) {
+            throw new BadRequestException(ERROR_CODES.EMAIL_TEMPLATE_NOT_FOUND);
+        }
+        return emailTemplate;
     }
 
     public async getAll(skip: number, limit: number): Promise<EmailTemplateInterface[]> {

@@ -20,8 +20,8 @@ export class UserModel implements UserInterface {
         this.email = user.email;
         this.name = user.name;
         this.password = user.password;
-        this.isSubscribed = user.isSubscribed;
-        this.isVerified = user.isVerified;
+        this.isSubscribed = user.isSubscribed || true;
+        this.isVerified = user.isVerified || false;
     }
 }
 

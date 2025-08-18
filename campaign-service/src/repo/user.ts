@@ -4,6 +4,7 @@ import { DBInterface } from "../infra/db";
 export interface UserRepoInterface {
     create(user: UserInterface): Promise<UserInterface>;
     getById(userId: string): Promise<UserInterface | null>;
+    getByEmail(email: string): Promise<UserInterface | null>;
     getUsers(predicate: Record<string, any>, limit: number, offset: number): Promise<UserInterface[]>;
     countUsers(predicate: Record<string, any>): Promise<number>;
 }
@@ -20,6 +21,10 @@ export class UserRepo implements UserRepoInterface {
 
     public async getById(userId: string): Promise<UserInterface | null> {
         return this.db.findOne(this.collection, { _id: userId });
+    }
+
+    public async getByEmail(email: string): Promise<UserInterface | null> {
+        return this.db.findOne(this.collection, { email });
     }
 
     public async getUsers(predicate: Record<string, any>, limit: number, offset: number): Promise<UserInterface[]> {
