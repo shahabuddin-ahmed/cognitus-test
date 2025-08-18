@@ -86,6 +86,7 @@ export class CampaignService extends Controller implements CampaignServiceInterf
             const emailPayloads = {
                 subject: campaign.subject,
                 body: campaign.body,
+                templateName: "promotionalEmail",
                 users,
             }
 
