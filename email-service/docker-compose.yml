@@ -1,0 +1,34 @@
+version: "3"
+services:
+  web:
+    container_name: emailService
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 3001:3001
+    volumes:
+      - .:/server
+    environment:
+      MONGO_HOST: mongodb://local_mongo:27017
+      KAFKA_HOST: local_kafka:9092
+      KAFKA_TOPIC: email-topic
+      KAFKA_GROUP_ID: email-consumer-group
+      SENDER_NAME: default-sender
+      SENDER_HOST: smtp.gmail.com
+      SENDER_PORT: 587
+      SENDER_AUTH_USER: your-email@gmail.com
+      SENDER_AUTH_PASS: your-email-password
+      SENDER_SENDER_FROM: your-email@gmail.com
+      SENDER_SENDER_NAME: Default Sender
+      AWS_ACCESS_KEY_ID: your-access-key-id
+      AWS_SECRET_ACCESS_KEY: your-secret-access-key
+      AWS_REGION: ap-southeast-1
+      APPLICATION_SERVER_PORT: 3001
+      APP_FORCE_SHUTDOWN_SECOND: 30
+    networks:
+      - cognitus-network
+
+networks:
+  cognitus-network:
+    external: true

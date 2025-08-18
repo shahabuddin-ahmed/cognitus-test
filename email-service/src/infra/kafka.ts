@@ -26,6 +26,7 @@ export class KafkaMQ implements KafkaMQInterface {
                         });
 
                         console.log(`Processed message: ${message.value?.toString()} from topic: ${topic}, partition: ${partition}`);
+                        
                         if (option?.autoCommit) {
                             await this.consumer.commitOffsets([
                                 {
