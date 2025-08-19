@@ -1,7 +1,7 @@
 {
-    "name": "email-service-api",
+    "name": "campaign-service-api",
     "version": "1.0.0",
-    "description": "Email Service API",
+    "description": "Campaign Service API",
     "main": "app.ts",
     "scripts": {
         "dev": "nodemon",
@@ -13,24 +13,23 @@
     "author": "Shahabuddin Ahmed",
     "license": "MIT",
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.864.0",
+        "axios": "^1.11.0",
+        "bcrypt": "^6.0.0",
         "body-parser": "^1.20.3",
-        "ejs": "^3.1.10",
         "express": "^4.21.2",
         "joi": "^17.13.3",
+        "jsonwebtoken": "^9.0.2",
         "kafkajs": "^2.2.4",
         "mongodb": "^6.12.0",
-        "morgan": "^1.10.0",
-        "nodemailer": "^7.0.5"
+        "morgan": "^1.10.0"
     },
     "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
         "@types/body-parser": "^1.19.5",
-        "@types/ejs": "^3.1.5",
         "@types/express": "^4.17.21",
-        "@types/kafka-node": "^3.0.0",
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/morgan": "^1.9.9",
         "@types/node": "^22.5.5",
-        "@types/nodemailer": "^7.0.0",
         "@typescript-eslint/eslint-plugin": "^8.6.0",
         "@typescript-eslint/parser": "^8.6.0",
         "eslint": "^9.11.0",

@@ -1,0 +1,29 @@
+import { JwtPayload, verify } from "jsonwebtoken";
+import config from "../../config/config";
+import { NextFunction, Request, Response } from "express";
+import { UnauthorizedException } from "../exception/unauthrozied-exception";
+import { ERROR_CODES } from "../../constant/error";
+
+declare global {
+    namespace Express {
+        interface Request {
+            user: JwtPayload;
+        }
+    }
+};
+
+export const authenticated = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const authorizationHeader = req.headers.authorization;
+	if (!authorizationHeader) {
+        throw new UnauthorizedException(ERROR_CODES.E_INVALID_TOKEN,  "Please provide the access token");
+	}
+
+    const token = authorizationHeader.split(" ")[1];
+    try {
+        const jwtPayload = verify(token, config.JWT.JWT_SECRET);
+        req.user = jwtPayload as JwtPayload;
+        next();
+    } catch (err) {
+        throw new UnauthorizedException(ERROR_CODES.E_INVALID_TOKEN, "Invalid access token");
+    }
+};
