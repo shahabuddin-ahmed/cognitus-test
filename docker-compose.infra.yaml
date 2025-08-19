@@ -1,8 +1,15 @@
 version: "3"
 services:
+  db:
+    image: mongo
+    container_name: local_mongo_cognitus
+    ports:
+      - "27017:27017"
+    networks:
+      - cognitus-network
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    container_name: local_zookeeper
+    container_name: local_zookeeper_cognitus
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -13,7 +20,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
-    container_name: local_kafka
+    container_name: local_kafka_cognitus
     depends_on:
       - zookeeper
     ports:
