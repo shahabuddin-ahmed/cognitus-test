@@ -10,10 +10,12 @@ services:
     volumes:
       - .:/server
     environment:
-      MONGO_HOST: mongodb://local_mongo:27017
+      MONGO_HOST: mongodb://local_mongo_cognitus:27017
       MONGO_DB: test
       APPLICATION_SERVER_PORT: 3000
       APP_FORCE_SHUTDOWN_SECOND: 30
+      CAMPAIGN_URL: http://campaignService:3001
+      EMAIL_URL: http://emailService:3002
     networks:
       - cognitus-network
 

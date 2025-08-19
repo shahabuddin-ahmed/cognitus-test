@@ -28,7 +28,7 @@ export class UserRepo implements UserRepoInterface {
     }
 
     public async getUsers(predicate: Record<string, any>, limit: number, offset: number): Promise<UserInterface[]> {
-        return this.db.find(this.collection, predicate, { limit, skip: offset });
+        return this.db.find(this.collection, predicate, { limit, skip: offset }, { password: 0 });
     }
 
     public async countUsers(predicate: Record<string, any>): Promise<number> {

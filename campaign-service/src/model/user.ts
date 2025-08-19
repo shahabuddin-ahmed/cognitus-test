@@ -2,7 +2,7 @@ export interface UserInterface {
     id: string;
     email: string;
     name: string;
-    password: string;
+    password?: string;
     isSubscribed: boolean;
     isVerified: boolean;
 }
@@ -19,7 +19,7 @@ export class UserModel implements UserInterface {
         this.id = user.id;
         this.email = user.email;
         this.name = user.name;
-        this.password = user.password;
+        this.password = user.password!;
         this.isSubscribed = user.isSubscribed || true;
         this.isVerified = user.isVerified || false;
     }

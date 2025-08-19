@@ -23,8 +23,9 @@ export class UserService extends Controller implements UserServiceInterface {
         if (existUser) {
             throw new BadRequestException(ERROR_CODES.USER_ALREADY_EXISTS);
         }
-        const hashedPassword = await this.hashPassword(user.password);
-        return await this.userRepo.create({ ...user, password: hashedPassword });
+        const hashedPassword = await this.hashPassword(user.password!);
+        const { password, ...createdUser } = await this.userRepo.create({ ...user, password: hashedPassword });
+        return createdUser;
     }
 
     public async login(email: string, password: string): Promise<UserInterface | null> {
@@ -33,13 +34,15 @@ export class UserService extends Controller implements UserServiceInterface {
             throw new BadRequestException(ERROR_CODES.USER_NOT_FOUND);
         }
 
-		const checkPassword = await this.checkPassword(password, checkUser.password);
+        const { password: checkPasswordHash, ...updatedUser } = checkUser;
+
+		const checkPassword = await this.checkPassword(password, checkPasswordHash!);
 		if (!checkPassword) {
 			throw new BadRequestException(ERROR_CODES.INVALID_CREDENTIALS);
 		}
 
 		const accessToken = await this.createToken(checkUser);
-        return { ...checkUser, accessToken };
+        return { ...updatedUser, accessToken };
     }
 
     private hashPassword(password: string): Promise<string> {
@@ -53,6 +56,7 @@ export class UserService extends Controller implements UserServiceInterface {
 	private async createToken(user: UserInterface): Promise<string> {
 		const payload = {
 			userID: user.id,
+            name: user.name,
 			email: user.email
 		};
 

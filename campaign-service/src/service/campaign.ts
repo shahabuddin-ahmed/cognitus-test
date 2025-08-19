@@ -64,12 +64,12 @@ export class CampaignService extends Controller implements CampaignServiceInterf
             throw new BadRequestException(ERROR_CODES.CAMPAIGN_NOT_FOUND);
         }
 
-        const totalUsers = await this.userRepo.countUsers({ isSubscribed: 'true' });
+        const totalUsers = await this.userRepo.countUsers({ isSubscribed: true });
         console.log(`Total users to process: ${totalUsers}`);
         await this.campaignRepo.updateStatus(campaignID, CAMPAIGN_STATUS.SENDING);
 
         for (let offset = 0; offset < totalUsers; offset += batchSize) {
-            const userBatch = await this.userRepo.getUsers({ isSubscribed: 'true' }, batchSize, offset);
+            const userBatch = await this.userRepo.getUsers({ isSubscribed: true }, batchSize, offset);
 
             if (!userBatch.length) {
                 return;

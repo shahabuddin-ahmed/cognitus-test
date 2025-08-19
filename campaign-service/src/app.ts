@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
     // Initialize Repo
     const campaignRepo = await newCampaignRepo(db, "campaign");
-    const userRepo = await newUserRepo(db, "user");
+    const userRepo = await newUserRepo(db, "customer");
 
     // Initialize Service
     const campaignService = await newCampaignService(campaignRepo, userRepo, kafkaMQ);
