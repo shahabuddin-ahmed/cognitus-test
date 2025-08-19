@@ -8,7 +8,7 @@ services:
     networks:
       - cognitus-network
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.5.0
     container_name: local_zookeeper_cognitus
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -19,7 +19,7 @@ services:
       - cognitus-network
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.0
     container_name: local_kafka_cognitus
     depends_on:
       - zookeeper
