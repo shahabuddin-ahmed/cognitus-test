@@ -13,35 +13,31 @@ export class KafkaMQ implements KafkaMQInterface {
     public async consumeFromTopic(topic: string, workerFn: (message: EachMessagePayload) => any, option?: { autoCommit: boolean }): Promise<void> {
         try {
             await this.consumer.run({
-                eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
+                eachBatch: async ({ batch, resolveOffset, heartbeat, commitOffsetsIfNecessary }) => {
                     try {
-                        await workerFn({
-                            topic, partition, message,
-                            heartbeat: function (): Promise<void> {
-                                throw new Error("Function not implemented.");
-                            },
-                            pause: function (): () => void {
-                                throw new Error("Function not implemented.");
-                            }
-                        });
+                        await Promise.all(batch.messages.map(async (message) => {
+                            await workerFn({
+                                topic: batch.topic,
+                                partition: batch.partition,
+                                message,
+                                heartbeat,
+                                pause: () => () => {},
+                            });
+                            resolveOffset(message.offset);
+                        }));
 
-                        console.log(`Processed message: ${message.value?.toString()} from topic: ${topic}, partition: ${partition}`);
-                        
-                        if (option?.autoCommit) {
-                            await this.consumer.commitOffsets([
-                                {
-                                    topic,
-                                    partition,
-                                    offset: (parseInt(message.offset, 10) + 1).toString(),
-                                },
-                            ]);
-                            console.log(`Committed offset ${message.offset} for partition ${partition}`);
+                        if (!option?.autoCommit) {
+                            await commitOffsetsIfNecessary();
                         }
+
+                        await heartbeat();
+                        console.log(`Processed batch of ${batch.messages.length} messages from ${batch.topic}`);
+
                     } catch (err) {
-                        console.error("Error processing message:", err);
+                        console.error("Error in batch:", err);
                     }
-                },
-            });
+                }
+            })
         } catch (err) {
             console.error("Error consuming from Kafka topic:", err);
         }

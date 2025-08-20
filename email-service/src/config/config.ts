@@ -66,7 +66,7 @@ const config: Config = {
         SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "your-secret-access-key",
         REGION: process.env.AWS_REGION || "us-east-1"
     },
-    APPLICATION_SERVER_PORT: Number(process.env.APPLICATION_SERVER_PORT) || 3001,
+    APPLICATION_SERVER_PORT: Number(process.env.APPLICATION_SERVER_PORT) || 3002,
     APP_FORCE_SHUTDOWN_SECOND: Number(process.env.APP_FORCE_SHUTDOWN_SECOND) || 30
 };
 
