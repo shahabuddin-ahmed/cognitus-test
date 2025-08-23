@@ -3,7 +3,7 @@ services:
   web:
     container_name: emailService
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: .
     ports:
       - 3002:3002

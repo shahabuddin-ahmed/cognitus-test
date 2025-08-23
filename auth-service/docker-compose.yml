@@ -3,7 +3,7 @@ services:
   web:
     container_name: authService
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: .
     ports:
       - 3000:3000

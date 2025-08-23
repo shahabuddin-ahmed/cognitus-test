@@ -3,7 +3,7 @@ services:
   web:
     container_name: campaignService
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: .
     ports:
       - 3001:3001
